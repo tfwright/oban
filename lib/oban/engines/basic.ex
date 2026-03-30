@@ -69,9 +69,13 @@ defmodule Oban.Engines.Basic do
 
   @impl Engine
   def insert_job(%Config{} = conf, %Changeset{} = changeset, opts) do
-    fun = fn -> insert_unique(conf, changeset, opts) end
+    if Repo.in_transaction?(conf) do
+      insert_unique(conf, changeset, opts)
+    else
+      fun = fn -> insert_unique(conf, changeset, opts) end
 
-    with {:ok, result} <- Repo.transaction(conf, fun), do: result
+      with {:ok, result} <- Repo.transaction(conf, fun), do: result
+    end
   end
 
   @impl Engine

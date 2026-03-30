@@ -312,6 +312,16 @@ for engine <- [Oban.Engines.Basic, Oban.Engines.Lite, Oban.Engines.Dolphin] do
         assert job_1.id != job_2.id
         assert job_1.id == job_3.id
       end
+
+      @tag skip: @engine != Basic
+      @tag :unboxed
+      @tag oban_opts: [repo: UnboxedRepo]
+      test "propagating db errors raised when inserting within a multi", %{name: name} do
+        changeset = Worker.new(%{ref: 1}) |> Ecto.Changeset.put_change(:state, "bogus")
+        multi = Oban.insert(name, Multi.new(), :job, changeset)
+
+        assert_raise Postgrex.Error, fn -> UnboxedRepo.transaction(multi) end
+      end
     end
 
     describe "insert!/2" do
