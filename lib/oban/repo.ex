@@ -152,6 +152,10 @@ defmodule Oban.Repo do
     transaction(conf, fun_or_multi, opts, 1)
   end
 
+  defp transaction(%Config{transaction_retry: false} = conf, fun_or_multi, opts, _attempt) do
+    __dispatch__(:transaction, [conf, fun_or_multi], opts)
+  end
+
   defp transaction(conf, fun_or_multi, opts, attempt) do
     __dispatch__(:transaction, [conf, fun_or_multi], opts)
   rescue

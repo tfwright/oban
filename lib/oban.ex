@@ -88,6 +88,7 @@ defmodule Oban do
           | {:shutdown_grace_period, non_neg_integer()}
           | {:stage_interval, timeout()}
           | {:testing, :disabled | :inline | :manual}
+          | {:transaction_retry, boolean()}
 
   @typedoc """
   Options for draining jobs from a queue.
@@ -426,6 +427,11 @@ defmodule Oban do
   * `:testing` — a mode that controls how an instance is configured for testing. When set to
     `:inline` or `:manual` queues, peers, and plugins are automatically disabled. Defaults to
     `:disabled`, no test mode.
+
+  * `:transaction_retry` — whether to automatically retry internal transactions on database errors
+    such as connection loss or deadlocks. Set to `false` to disable retries, which is useful when
+    calling `Oban.insert/2` inside an existing transaction to prevent retries from masking errors
+    within savepoints. Defaults to `true`.
 
   ### Twiddly Options
 

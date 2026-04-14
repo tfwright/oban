@@ -139,6 +139,14 @@ defmodule Oban.ConfigTest do
       assert_valid(testing: :disabled)
     end
 
+    test ":transaction_retry is validated as a boolean" do
+      refute_valid(transaction_retry: nil)
+      refute_valid(transaction_retry: :enabled)
+
+      assert_valid(transaction_retry: true)
+      assert_valid(transaction_retry: false)
+    end
+
     test "alternatives are suggested for unknown options when they match" do
       assert {:error, "unknown option :queue, did you mean :queues?"} =
                Config.validate(queue: false)
